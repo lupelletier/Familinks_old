@@ -3,7 +3,7 @@ name: Deploy static content to Pages
 on:
   push:
     branches:
-      - main
+      - main  # Trigger the workflow on pushes to the main branch
   workflow_dispatch:
 
 permissions:
@@ -39,3 +39,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist # Change this to your build directory
+          branch: deploy # Specify the branch to deploy to
