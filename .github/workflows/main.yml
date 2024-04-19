@@ -3,40 +3,37 @@ name: Deploy static content to Pages
 on:
   push:
     branches:
-      - main  # Trigger the workflow on pushes to the main branch
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
+      - main
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14.x' # Change to your desired Node.js version
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build
+      
+      # Setup Bun
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      # Run Bun commands
+      - name: Install dependencies with Bun
+        run: bun install
+      - name: Index TypeScript files with Bun
+        run: bun index.ts
+      - name: Run build command with Bun
+        run: bun run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Deploy to GitHub Pages using peaceiris/actions-gh-pages
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist # Change this to your build directory
-          branch: deploy # Specify the branch to deploy to
+          publish_dir: ./dist # Directory containing the built content to deploy
