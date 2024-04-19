@@ -6,12 +6,12 @@ on:
       - main
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       # Setup Bun
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -19,21 +19,13 @@ jobs:
       # Run Bun commands
       - name: Install dependencies with Bun
         run: bun install
-      - name: Index TypeScript files with Bun
-        run: bun index.ts
       - name: Run build command with Bun
         run: bun run build
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
       # Deploy to GitHub Pages using peaceiris/actions-gh-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist # Directory containing the built content to deploy
+          publish_branch: gh-pages # Branch to deploy to
