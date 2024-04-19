@@ -19,5 +19,7 @@ jobs:
       # Run Bun commands
       - name: Install dependencies with Bun
         run: bun install
+      - name: Run build command with Bun
+        run: bun run predeploy
       - name: Run deploy command with Bun
         run: bun run deploy
